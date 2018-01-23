@@ -1,0 +1,27 @@
+{
+  "name": "hexlogjs",
+  "version": "0.0.0",
+  "description": "Super fast logging in a smarter format",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DerekKeeler/hexlogjs.git"
+  },
+  "keywords": [
+    "fast",
+    "logger",
+    "stream",
+    "binary",
+    "logging",
+    "schema"
+  ],
+  "author": "Derek Keeler <derekkeelernw@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DerekKeeler/hexlogjs/issues"
+  },
+  "homepage": "https://github.com/DerekKeeler/hexlogjs#readme"
+}
