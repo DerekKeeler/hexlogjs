@@ -4,7 +4,9 @@
   "description": "Super fast logging in a smarter format",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --watch",
+    "test:ci": "jest",
+    "lint": "prettier --write ./src/**.js && eslint ./src"
   },
   "repository": {
     "type": "git",
@@ -23,5 +25,12 @@
   "bugs": {
     "url": "https://github.com/DerekKeeler/hexlogjs/issues"
   },
-  "homepage": "https://github.com/DerekKeeler/hexlogjs#readme"
+  "homepage": "https://github.com/DerekKeeler/hexlogjs#readme",
+  "devDependencies": {
+    "eslint": "^4.16.0",
+    "jest": "^22.1.4",
+    "jest-cli": "^22.1.4",
+    "prettier": "^1.10.2",
+    "rimraf": "^2.6.2"
+  }
 }
