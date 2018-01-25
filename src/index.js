@@ -1,7 +1,7 @@
-const schema = require('./schema');
+const Logger = require('./logger');
 const types = require('./types');
 
 module.exports = {
-  schema,
+  Logger,
   types,
 };

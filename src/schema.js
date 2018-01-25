@@ -23,6 +23,6 @@ module.exports = definedSchema => {
   const schemaId = id(crcString);
   return new Function(
     'msg',
-    `let buf = Buffer.allocUnsafe(${bufSize});buf[0] = ${schemaId}; ${fnString}; return buf;`
+    `let buf = Buffer.allocUnsafe(${bufSize}); buf[0] = ${schemaId}; ${fnString}; return buf;`
   );
 };
