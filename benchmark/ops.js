@@ -12,7 +12,7 @@ const filename = `test-${Date.now()}.log`;
 
 // Setup Winston
 const winstonLocation = `${appDir}/log-output/winston/`;
-mkdirp(winstonLocation);
+mkdirp.sync(winstonLocation);
 const winstonLog = new winston.Logger({
   level: 'info',
   transports: [
@@ -24,45 +24,57 @@ winstonLog.info({fps: 'test'});
 
 // Setup Pino
 const pinoLocation = `${appDir}/log-output/pino/`;
-mkdirp(pinoLocation);
+mkdirp.sync(pinoLocation);
 const pinoLog = pino(fs.createWriteStream(pinoLocation + filename));
 // Log to make sure that the file is created before our test
 pinoLog.info({fps: 'test'});
 
 // Setup hexlogjs
 const hexlogjsLocation = `${appDir}/log-output/hexlogjs/`;
-mkdirp(hexlogjsLocation);
-const hexlogjs = new HexLogger();
+mkdirp.sync(hexlogjsLocation);
+const hexlogjs = new HexLogger({
+  lowResolutionTime: false
+});
 const spec = hexlogjs.defineSchema(types.levels.info, {
-  fps: types.string.fixedLength(4),
+  fps: types.float,
+  thing: 'yes',
 });
 
 hexlogjs.addTransport('writestream', transports.file(hexlogjsLocation + filename));
 // Log to make sure that the file is created before our test
-hexlogjs.log(spec, {fps: 'test'});
+hexlogjs.log(spec, {fps: 14.4});
 
 
 const suite = new Benchmark.Suite;
 
 // add tests
 suite.add('Winston', function() {
-  winstonLog.info({fps: 'test'});
+  winstonLog.info({fps: 14.4, thing: 'yes'});
 })
 .add('Pino', function() {
-  pinoLog.info({fps: 'test'});
+  pinoLog.info({fps: 14.4, thing: 'yes'});
 })
 .add('hexlogjs', function() {
-  hexlogjs.log(spec, {fps: 'test'});
+  hexlogjs.log(spec, {fps: 14.4});
 })
 // add listeners
 .on('cycle', function(event) {
   console.log(String(event.target));
 })
 .on('complete', function() {
-  console.log('Fastest is ' + this.filter('fastest').map('name'));
+  const results = this.reduce((col, test) => {
+    col[test.name] = test.hz;
+    return col;
+  }, {});
+
+  Object.keys(results).forEach(loggerName => {
+    if (loggerName !== 'hexlogjs') {
+      console.log(`hexlogjs is faster than ${loggerName} by ${(results.hexlogjs / results[loggerName]).toFixed(2)}x`);
+    }
+  });
 
   //Clean up after tests
   rimraf.sync(`${appDir}/log-output`);
 })
 // run async
-.run({ 'async': true });
+.run({ 'async': true, 'delay': 2 });
