@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest --watch",
     "test:ci": "jest",
-    "lint": "prettier --write ./src/**.js && eslint ./src"
+    "lint": "prettier --write ./src/**.js && eslint ./src",
+    "benchmark": "node benchmark/ops.js"
   },
   "repository": {
     "type": "git",
@@ -35,5 +36,8 @@
     "prettier": "^1.10.2",
     "rimraf": "^2.6.2",
     "winston": "^2.4.0"
+  },
+  "dependencies": {
+    "mkdirp": "^0.5.1"
   }
 }
