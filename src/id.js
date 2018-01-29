@@ -1,5 +1,9 @@
 module.exports = input => {
-  const buf = Buffer.isBuffer(input) ? input : Buffer.from(input);
+  if (typeof input !== 'string') {
+    throw new Error('Input not a string');
+  }
+
+  const buf = Buffer.from(input);
 
   let crc = 0;
   let accum = 0;

@@ -54,9 +54,9 @@ module.exports = class Logger {
   }
 
   set logLevel(val) {
-    this._logLevel = val;
-
-    this.redefineLevels();
+    if (typeof val === 'number') {
+      this._logLevel = val;
+    }
   }
 
   get logLevel() {
