@@ -25,10 +25,11 @@ describe('schema', () => {
           `${bufName}.writeDoubleLE(${varName}, ${offset});`,
       }
     });
-    const fnString = returned.toString();
+    const fnString = returned.schemaFn.toString();
     const fnBody = fnString.substring(fnString.indexOf("{") + 1, fnString.lastIndexOf("}")).trim();
-
-    expect(returned).toBeInstanceOf(Function);
+  
+    expect(returned).toBeInstanceOf(Object);
+    expect(returned).toHaveProperty('schemaId', '0x3b');
     expect(fnBody).toEqual('let buf = Buffer.allocUnsafe(9); buf[0] = 0x3b; buf.writeDoubleLE(msg.test, 1);; return buf;');
   });
 });

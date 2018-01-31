@@ -19,6 +19,7 @@ module.exports = class Logger {
   constructor(opts) {
     this.transports = {};
     this.transportsInit = {};
+    this.schemas = {};
     this._logLevel = 7;
     this.getDate = opts && opts.lowResolutionTime ? getDate : Date.now;
 
@@ -26,9 +27,28 @@ module.exports = class Logger {
   }
 
   defineSchema(level, definedSchema) {
+    const schemaVals = Object.assign({}, definedSchema, { level: level[1] });
+    const { schemaId, schemaFn } = schema(schemaVals);
+
+    if (this.schemas[schemaId]) {
+      throw new Error(
+        'Schema already defined. Either the same schema is being defined multiple times or a CRC collision has occurred.'
+      );
+    }
+
+    this.schemas[schemaId] = definedSchema;
+
+    Object.keys(this.transports).forEach(name => {
+      const transport = this.transports[name];
+
+      if (transport && typeof transport.header === 'function') {
+        transport.header(this.transportsInit[name], schemaId, schemaVals);
+      }
+    });
+
     return {
       level: level[0],
-      schema: schema(Object.assign({}, definedSchema, { level: level[1] })),
+      schema: schemaFn,
     };
   }
 
@@ -65,7 +85,7 @@ module.exports = class Logger {
 
   addTransport(name, transport) {
     if (this.transports[name]) {
-      throw new Error(`transport ${name} already exists`);
+      throw new Error(`Transport ${name} already exists`);
     }
 
     this.transports[name] = transport;
@@ -74,6 +94,11 @@ module.exports = class Logger {
       this.transportsInit[name] = transport.init();
     }
 
+    Object.keys(this.schemas).forEach(key =>
+      transport.header(this.transportsInit[name], key, this.schemas[key])
+    );
+
+    // @todo: Debounce this
     this.defineTransportFn();
   }
 

@@ -18,7 +18,11 @@ module.exports = definedSchema => {
     // Defined types should contain enough info to generate a function from
     const { name: typeName, bytes, method } = definedSchema[key];
 
-    if (typeof typeName !== 'string' || typeof bytes !== 'number' || typeof method !== 'function') {
+    if (
+      typeof typeName !== 'string' ||
+      typeof bytes !== 'number' ||
+      typeof method !== 'function'
+    ) {
       throw new Error(`Invalid type used: ${key}`);
     }
 
@@ -30,8 +34,11 @@ module.exports = definedSchema => {
   }, '');
 
   const schemaId = id(crcString);
-  return new Function(
-    'msg',
-    `let buf = Buffer.allocUnsafe(${bufSize}); buf[0] = ${schemaId}; ${fnString}; return buf;`
-  );
+  return {
+    schemaFn: new Function(
+      'msg',
+      `let buf = Buffer.allocUnsafe(${bufSize}); buf[0] = ${schemaId}; ${fnString}; return buf;`
+    ),
+    schemaId,
+  };
 };

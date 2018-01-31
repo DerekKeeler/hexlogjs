@@ -36,11 +36,11 @@ const hexlogjs = new HexLogger({
   lowResolutionTime: false
 });
 const spec = hexlogjs.defineSchema(types.levels.info, {
-  fps: types.float,
+  fps: types.double,
   thing: 'yes',
 });
 
-hexlogjs.addTransport('writestream', transports.file(hexlogjsLocation + filename));
+hexlogjs.addTransport('writestream', transports.file(hexlogjsLocation, filename));
 // Log to make sure that the file is created before our test
 hexlogjs.log(spec, {fps: 14.4});
 
