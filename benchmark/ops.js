@@ -36,26 +36,27 @@ const hexlogjs = new HexLogger({
   lowResolutionTime: false
 });
 const spec = hexlogjs.defineSchema(types.levels.info, {
-  fps: types.double,
+  fps: types.float,
   thing: 'yes',
+  testString: types.string.fixedLength(4)
 });
 
 hexlogjs.addTransport('writestream', transports.file(hexlogjsLocation, filename));
 // Log to make sure that the file is created before our test
-hexlogjs.log(spec, {fps: 14.4});
+hexlogjs.log(spec, {fps: 14.4, testString: 'test'});
 
 
 const suite = new Benchmark.Suite;
 
 // add tests
 suite.add('Winston', function() {
-  winstonLog.info({fps: 14.4, thing: 'yes'});
+  winstonLog.info({fps: 14.4, thing: 'yes', testString: 'test'});
 })
 .add('Pino', function() {
-  pinoLog.info({fps: 14.4, thing: 'yes'});
+  pinoLog.info({fps: 14.4, thing: 'yes', testString: 'test'});
 })
 .add('hexlogjs', function() {
-  hexlogjs.log(spec, {fps: 14.4});
+  hexlogjs.log(spec, {fps: 14.4, testString: 'test'});
 })
 // add listeners
 .on('cycle', function(event) {

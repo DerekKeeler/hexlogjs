@@ -5,7 +5,6 @@ module.exports = input => {
 
   const buf = Buffer.from(input);
 
-  let crc = 0;
   let accum = 0;
 
   for (let index = 0, len = buf.length; index < len; index++) {
@@ -13,7 +12,5 @@ module.exports = input => {
     accum += byte;
   }
 
-  crc += accum % 256;
-
-  return `0x${(crc % 256).toString(16)}`;
+  return `0x${(accum % 256).toString(16)}`;
 };

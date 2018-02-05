@@ -4,8 +4,7 @@ const addFixedLength = obj =>
       name: 'stringFixedLength',
       bytes,
       method: (bufName, varName, offset) =>
-        `${bufName}.writeUInt8(${bytes}, ${offset});${bufName}.write(${varName}, ${offset +
-          1});`,
+        `${bufName}.write(${varName}, ${offset});`,
     }),
   });
 
