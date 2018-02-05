@@ -1,4 +1,5 @@
 const schema = require('./schema');
+const uInt48 = require('./types/uint48');
 
 const getDate = (() => {
   let date;
@@ -21,13 +22,21 @@ module.exports = class Logger {
     this.transportsInit = {};
     this.schemas = {};
     this._logLevel = 7;
+    this._setTimestamp = !(
+      opts &&
+      typeof opts.timestamp === 'boolean' &&
+      !opts.timestamp
+    );
     this.getDate = opts && opts.lowResolutionTime ? getDate : Date.now;
 
     this.defineTransportFn();
   }
 
   defineSchema(level, definedSchema) {
-    const schemaVals = Object.assign({}, definedSchema, { level: level[1] });
+    const schemaVals = Object.assign({}, definedSchema, {
+      level: level[1],
+      timestamp: this._setTimestamp ? uInt48 : false,
+    });
     const { schemaId, schemaFn } = schema(schemaVals);
 
     if (this.schemas[schemaId]) {
@@ -48,6 +57,7 @@ module.exports = class Logger {
 
     return {
       level: level[0],
+      timestamp: this._setTimestamp,
       schema: schemaFn,
     };
   }
@@ -67,8 +77,10 @@ module.exports = class Logger {
 
   log(schemaObj, vals) {
     if (this.logLevel > schemaObj.level) {
-      // @todo: Pass in timestamp
-      // this.getDate();
+      if (schemaObj.timestamp) {
+        vals.timestamp = this.getDate();
+      }
+
       this.transportFn(schemaObj.schema(vals));
     }
   }

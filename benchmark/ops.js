@@ -25,7 +25,7 @@ winstonLog.info({fps: 'test'});
 // Setup Pino
 const pinoLocation = `${appDir}/log-output/pino/`;
 mkdirp.sync(pinoLocation);
-const pinoLog = pino(fs.createWriteStream(pinoLocation + filename));
+const pinoLog = pino({extreme: true}, fs.createWriteStream(pinoLocation + filename));
 // Log to make sure that the file is created before our test
 pinoLog.info({fps: 'test'});
 
@@ -33,7 +33,8 @@ pinoLog.info({fps: 'test'});
 const hexlogjsLocation = `${appDir}/log-output/hexlogjs/`;
 mkdirp.sync(hexlogjsLocation);
 const hexlogjs = new HexLogger({
-  lowResolutionTime: false
+  lowResolutionTime: false,
+  timestamp: true
 });
 const spec = hexlogjs.defineSchema(types.levels.info, {
   fps: types.float,
