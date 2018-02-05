@@ -16,6 +16,8 @@ const getDate = (() => {
   };
 })();
 
+// @todo: Add schema version to header
+// @todo: Add timestamp mode to header
 module.exports = class Logger {
   constructor(opts) {
     this.transports = {};
