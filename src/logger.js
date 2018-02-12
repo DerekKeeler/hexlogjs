@@ -36,24 +36,26 @@ module.exports = class Logger {
 
   defineSchema(level, definedSchema) {
     const schemaVals = Object.assign({}, definedSchema, {
+      timestamp: this._setTimestamp ? uInt48 : undefined,
       level: level[1],
-      timestamp: this._setTimestamp ? uInt48 : false,
     });
     const { schemaId, schemaFn } = schema(schemaVals);
+    // Remap schemaId to a value that can calculated on the fly faster
+    const accessSchemaId = Buffer.from([schemaId])[0].toString();
 
-    if (this.schemas[schemaId]) {
+    if (this.schemas[accessSchemaId]) {
       throw new Error(
         'Schema already defined. Either the same schema is being defined multiple times or a CRC collision has occurred.'
       );
     }
 
-    this.schemas[schemaId] = definedSchema;
+    this.schemas[accessSchemaId] = schemaVals;
 
     Object.keys(this.transports).forEach(name => {
       const transport = this.transports[name];
 
       if (transport && typeof transport.header === 'function') {
-        transport.header(this.transportsInit[name], schemaId, schemaVals);
+        transport.header(this.transportsInit[name], accessSchemaId, schemaVals);
       }
     });
 

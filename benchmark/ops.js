@@ -25,7 +25,7 @@ winstonLog.info({fps: 'test'});
 // Setup Pino
 const pinoLocation = `${appDir}/log-output/pino/`;
 mkdirp.sync(pinoLocation);
-const pinoLog = pino({extreme: true}, fs.createWriteStream(pinoLocation + filename));
+const pinoLog = pino({extreme: false}, fs.createWriteStream(pinoLocation + filename));
 // Log to make sure that the file is created before our test
 pinoLog.info({fps: 'test'});
 
@@ -37,27 +37,43 @@ const hexlogjs = new HexLogger({
   timestamp: true
 });
 const spec = hexlogjs.defineSchema(types.levels.info, {
-  fps: types.float,
-  thing: 'yes',
-  testString: types.string.fixedLength(4)
+  fps: types.double,
 });
 
 hexlogjs.addTransport('writestream', transports.file(hexlogjsLocation, filename));
 // Log to make sure that the file is created before our test
-hexlogjs.log(spec, {fps: 14.4, testString: 'test'});
+hexlogjs.log(spec, {fps: 14.4});
 
+
+// Setup hexlogjs
+const hexlogjsJSONLocation = `${appDir}/log-output/hexlogjsjson/`;
+mkdirp.sync(hexlogjsJSONLocation);
+const hexlogjsJSON = new HexLogger({
+  lowResolutionTime: false,
+  timestamp: true
+});
+const specJSON = hexlogjsJSON.defineSchema(types.levels.info, {
+  fps: types.double,
+});
+
+hexlogjsJSON.addTransport('writestream', transports.jsonFile(hexlogjsJSONLocation, filename));
+// Log to make sure that the file is created before our test
+hexlogjsJSON.log(specJSON, {fps: 14.4});
 
 const suite = new Benchmark.Suite;
 
 // add tests
 suite.add('Winston', function() {
-  winstonLog.info({fps: 14.4, thing: 'yes', testString: 'test'});
+  winstonLog.info({fps: 14.4});
 })
 .add('Pino', function() {
-  pinoLog.info({fps: 14.4, thing: 'yes', testString: 'test'});
+  pinoLog.info({fps: 14.4});
 })
-.add('hexlogjs', function() {
-  hexlogjs.log(spec, {fps: 14.4, testString: 'test'});
+// .add('hexlogjs', function() {
+//   hexlogjs.log(spec, {fps: 14.4});
+// })
+.add('hexlogjs', function () {
+hexlogjsJSON.log(specJSON, {fps: 14.4});
 })
 // add listeners
 .on('cycle', function(event) {
@@ -76,7 +92,7 @@ suite.add('Winston', function() {
   });
 
   //Clean up after tests
-  rimraf.sync(`${appDir}/log-output`);
+  // rimraf.sync(`${appDir}/log-output`);
 })
 // run async
 .run({ 'async': true, 'delay': 2 });
