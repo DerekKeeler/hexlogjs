@@ -8,14 +8,16 @@ const types = {
   double: {
     decode: (bufName, offsetVal) => `${bufName}.readDoubleLE(${offsetVal})`,
   },
-  stringFixed: {
-    // decode: (buf, offset, length) => `"${buf.toString('utf-8', offset, offset + length)}"`,
+  stringFixedLength: {
+    decode: (bufName, offsetVal, bytes) => `${bufName}.toString('utf-8', ${offsetVal}, ${bytes})`,
   },
   string: {
-    // decode: (buf, offset) => {
+    // decode: (buf, offset, length) => {
     //   const length = buf.readUInt8(offset);
     //   return `"${buf.toString('utf-8', ++offset, offset + length)}"`;
     // }
+    decode: (bufName, offsetVal) =>
+      `tempVal = ${bufName}.readUInt8(${offsetVal}), console.log(tempVal), ${bufName}.toString('utf-8', ${offsetVal} + 1, tempVal), offset += tempVal`,
   },
   uInt48: {
     decode: (bufName, offsetVal) => `${bufName}.readUIntLE(${offsetVal}, 6)`,
@@ -58,7 +60,7 @@ module.exports = (location, filename) => ({
       return col += addStringEnd(schemaLength, i, `"${key}":${fnVal}`);
     }, '');
 
-    schemas[schemaId] = new Function('buf', 'types', `let offset = 0; return \`{${fnString}}\n\`;`);
+    schemas[schemaId] = new Function('buf', 'types', `let offset = 0, tempVal; return \`{${fnString}}\n\`;`);
     console.log(schemas[schemaId].toString());
   },
   log: ({schemas, stream, types}, buf) => {

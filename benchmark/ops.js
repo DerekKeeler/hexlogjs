@@ -37,12 +37,12 @@ const hexlogjs = new HexLogger({
   timestamp: true
 });
 const spec = hexlogjs.defineSchema(types.levels.info, {
-  fps: types.double,
+  fps: types.string,
 });
 
 hexlogjs.addTransport('writestream', transports.file(hexlogjsLocation, filename));
 // Log to make sure that the file is created before our test
-hexlogjs.log(spec, {fps: 14.4});
+// hexlogjs.log(spec, {fps:'test'});
 
 
 // Setup hexlogjs
@@ -53,27 +53,27 @@ const hexlogjsJSON = new HexLogger({
   timestamp: true
 });
 const specJSON = hexlogjsJSON.defineSchema(types.levels.info, {
-  fps: types.double,
+  fps: types.string,
 });
 
 hexlogjsJSON.addTransport('writestream', transports.jsonFile(hexlogjsJSONLocation, filename));
 // Log to make sure that the file is created before our test
-hexlogjsJSON.log(specJSON, {fps: 14.4});
+hexlogjsJSON.log(specJSON, {fps: 'test'});
 
 const suite = new Benchmark.Suite;
 
 // add tests
 suite.add('Winston', function() {
-  winstonLog.info({fps: 14.4});
+  winstonLog.info({fps: 'test'});
 })
 .add('Pino', function() {
-  pinoLog.info({fps: 14.4});
+  pinoLog.info({fps: 'test'});
 })
 // .add('hexlogjs', function() {
 //   hexlogjs.log(spec, {fps: 14.4});
 // })
 .add('hexlogjs', function () {
-hexlogjsJSON.log(specJSON, {fps: 14.4});
+hexlogjsJSON.log(specJSON, {fps: 'test'});
 })
 // add listeners
 .on('cycle', function(event) {
